@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpromc
+  labels:
+    app: vpromc
+# deployment
+spec:
+  selector:
+    # match pod
+    matchLabels:
+      app: vpromc
+  replicas: 1
+  # def pod
+  template:
+    metadata:
+      labels:
+        app: vpromc
+    spec:
+      # def cons
+      containers:
+        - name: vpromc
+          image: memcached:latest
+          ports:
+            - name: vpromc-port
+              containerPort: 11211

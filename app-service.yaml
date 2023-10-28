@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vproapp-service
+# LB
+spec:
+  ports:
+    - port: 80
+      # port name defined in app-deploy
+      targetPort: vproapp-port
+      protocol: TCP
+  # match deployment name
+  selector:
+    app: vproapp
+  type: LoadBalancer
