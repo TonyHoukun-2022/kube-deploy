@@ -5,57 +5,57 @@ metadata:
   # clusterIP server routes request to pods with follow labels
   labels:
     app: vprodb
-  spec:
-    selector:
-      matchLabels:
+spec:
+  selector:
+    matchLabels:
+      app: vprodb
+  replicas: 1
+  # pod def
+  template:
+    metadata:
+      labels:
         app: vprodb
-    replicas: 1
-    # pod def
-    template:
-      metadata:
-        labels:
-          app: vprodb
-      spec:
-        # main con
-        containers:
-          - name: vprodb
-            image: vprofile/vprofiledb:V1
-            # VALID FOR mysql < v5
-            # args:
-            #   - "--ignore-db-dir=lost+found"
-            # match vol with tag given in ebs db vol
-            volumeMounts:
-              # vol target path in con
-              - mountPath: /var/lib/mysql
-                name: vprodb-data
-            ports:
-              - name: vprodb-port
-                containerPort: 3306
-            env:
-              # mysql img required
-              - name: MYSQL_ROOT_PASSWORD
-                # from app-secret
-                valueFrom:
-                  secretKeyRef:
-                    name: app-secret
-                    key: db-pass
-        # pod only run on node with follow label
-        nodeSelector:
-          zone: us-east-1a
-        # specify the vol created for db pod
-        volumes:
-          - name: vprodb-data
-            awsElasticBlockStore:
-              volumeID: vol-06f9205c4d52c258e
-              fsType: ext4
+    spec:
+      # main con
+      containers:
+        - name: vprodb
+          image: vprofile/vprofiledb:V1
+          # VALID FOR mysql < v5
+          # args:
+          #   - "--ignore-db-dir=lost+found"
+          # match vol with tag given in ebs db vol
+          volumeMounts:
+            # vol target path in con
+            - mountPath: /var/lib/mysql
+              name: vprodb-data
+          ports:
+            - name: vprodb-port
+              containerPort: 3306
+          env:
+            # mysql img required
+            - name: MYSQL_ROOT_PASSWORD
+              # from app-secret
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: db-pass
+      # pod only run on node with follow label
+      nodeSelector:
+        zone: us-east-1a
+      # specify the vol created for db pod
+      volumes:
+        - name: vprodb-data
+          awsElasticBlockStore:
+            volumeID: vol-06f9205c4d52c258e
+            fsType: ext4
 
-        # helper con => delete auto-gen lost+found dir
-        # run before main con
-        #  BusyBox can be used as an init container in a Kubernetes pod. Init containers are typically used for tasks that need to run before the main application container starts. BusyBox can perform various initialization tasks.
-        initContainers:
-          - name: busybox
-            image: busybox:latest
-            args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
-            volumeMounts:
-              - name: vprodb-data
-                mountPath: /var/lib/mysql
+      # helper con => delete auto-gen lost+found dir
+      # run before main con
+      #  BusyBox can be used as an init container in a Kubernetes pod. Init containers are typically used for tasks that need to run before the main application container starts. BusyBox can perform various initialization tasks.
+      initContainers:
+        - name: busybox
+          image: busybox:latest
+          args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
+          volumeMounts:
+            - name: vprodb-data
+              mountPath: /var/lib/mysql
