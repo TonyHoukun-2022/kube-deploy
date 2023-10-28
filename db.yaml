@@ -10,7 +10,7 @@ metadata:
       matchLabels:
         app: vprodb
     replicas: 1
-    # pod defi
+    # pod def
     template:
       metadata:
         labels:
@@ -46,7 +46,7 @@ metadata:
         volumes:
           - name: vprodb-data
             awsElasticBlockStore:
-              volumeID: vol-0557a1d24c68d7442
+              volumeID: vol-06f9205c4d52c258e
               fsType: ext4
 
         # helper con => delete auto-gen lost+found dir
